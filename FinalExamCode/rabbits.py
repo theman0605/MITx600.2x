@@ -24,8 +24,7 @@ def rabbitGrowth():
     rabbitList = range(CURRENTRABBITPOP)
     for rabbit in rabbitList:    
         if random.random() < 1 - (CURRENTRABBITPOP/MAXRABBITPOP):
-            increase += 1
-    CURRENTRABBITPOP += increase
+            CURRENTRABBITPOP += 1
             
 def foxGrowth():
     """ 
@@ -48,18 +47,21 @@ def foxGrowth():
     global CURRENTFOXPOP
 
     # TO DO
-    foxList = range(CURRENTFOXPOP)
-    increase = 0    
-    for fox in foxList:
-        while CURRENTRABBITPOP > 10:        
+    timeStepFoxPop = CURRENTFOXPOP    
+    for entry in range(timeStepFoxPop):
+        if CURRENTRABBITPOP > 10 and CURRENTFOXPOP > 10:
+            #See if fox eats rabbit
             if random.random() < CURRENTRABBITPOP/MAXRABBITPOP:
                 CURRENTRABBITPOP -= 1
-            if random.random() < 1/3:
-                increase += 1
-            else:
-                if random.random() < 0.10 and CURRENTFOXPOP > 10:
-                    increase -= 1
-    CURRENTFOXPOP += increase
+                # if fox eats, it might reproduce
+                if random.random() < 1/3:
+                    CURRENTFOXPOP += 1
+            # if fox doesn't eat, it might die!
+            elif random.random() < 0.90:
+                CURRENTFOXPOP -= 1
+            
+                
+        
     
     
             
@@ -74,13 +76,20 @@ def runSimulation(numSteps):
 
     Both lists should be `numSteps` items long.
     """
-
-    rabbits = []
-    foxes = []
-    for i in range(numSteps):
-        rabbits.append(rabbitGrowth())
-        foxes.append(foxGrowth())
-    pylab.plot(range(numSteps), rabbits, label="Rabbits")
-    pylab.plot(range(numSteps), foxes, label="Foxes")
+    timeSteps = range(numSteps)
+    rabbit_populations = []
+    fox_populations = []
+    for time in timeSteps:
+        rabbitGrowth()
+        foxGrowth()
+        rabbit_populations.append(CURRENTRABBITPOP)
+        fox_populations.append(CURRENTFOXPOP)
+    pylab.plot(timeSteps, rabbit_populations, label='Rabbit Population')
+    pylab.plot(timeSteps, fox_populations, label='Fox Population')
+    pylab.title('Woodland Critter Population')
+    pylab.xlabel('Timesteps')
+    pylab.ylabel('Population')
+    pylab.legend()
     pylab.show()
-    return(rabbits,foxes)
+    return (rabbit_populations, fox_populations)
+        
